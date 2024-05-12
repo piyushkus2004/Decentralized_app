@@ -13,7 +13,7 @@ const COST = tokens(1)
 const RATING = 4
 const STOCK = 5
 
-describe("Dappazon", () => {
+describe("blockzone", () => {
   let dappazon
   let deployer, buyer
 
@@ -22,13 +22,13 @@ describe("Dappazon", () => {
     [deployer, buyer] = await ethers.getSigners()
 
     // Deploy contract
-    const Dappazon = await ethers.getContractFactory("Dappazon")
-    dappazon = await Dappazon.deploy()
+    const blockzone = await ethers.getContractFactory("Dappazon")
+    dappazon = await blockzone.deploy()
   })
 
   describe("Deployment", () => {
     it("Sets the owner", async () => {
-      expect(await dappazon.owner()).to.equal(deployer.address)
+      expect(await blockzone.owner()).to.equal(deployer.address)
     })
   })
 
@@ -63,34 +63,34 @@ describe("Dappazon", () => {
 
     beforeEach(async () => {
       // List a item
-      transaction = await dappazon.connect(deployer).list(ID, NAME, CATEGORY, IMAGE, COST, RATING, STOCK)
+      transaction = await blockzone.connect(deployer).list(ID, NAME, CATEGORY, IMAGE, COST, RATING, STOCK)
       await transaction.wait()
 
       // Buy a item
-      transaction = await dappazon.connect(buyer).buy(ID, { value: COST })
+      transaction = await blockzone.connect(buyer).buy(ID, { value: COST })
       await transaction.wait()
     })
 
 
     it("Updates buyer's order count", async () => {
-      const result = await dappazon.orderCount(buyer.address)
+      const result = await blockzone.orderCount(buyer.address)
       expect(result).to.equal(1)
     })
 
     it("Adds the order", async () => {
-      const order = await dappazon.orders(buyer.address, 1)
+      const order = await blockzone.orders(buyer.address, 1)
 
       expect(order.time).to.be.greaterThan(0)
       expect(order.item.name).to.equal(NAME)
     })
 
     it("Updates the contract balance", async () => {
-      const result = await ethers.provider.getBalance(dappazon.address)
+      const result = await ethers.provider.getBalance(blockzone.address)
       expect(result).to.equal(COST)
     })
 
     it("Emits Buy event", () => {
-      expect(transaction).to.emit(dappazon, "Buy")
+      expect(transaction).to.emit(blockzone, "Buy")
     })
   })
 
@@ -99,18 +99,18 @@ describe("Dappazon", () => {
 
     beforeEach(async () => {
       // List a item
-      let transaction = await dappazon.connect(deployer).list(ID, NAME, CATEGORY, IMAGE, COST, RATING, STOCK)
+      let transaction = await blockzone.connect(deployer).list(ID, NAME, CATEGORY, IMAGE, COST, RATING, STOCK)
       await transaction.wait()
 
       // Buy a item
-      transaction = await dappazon.connect(buyer).buy(ID, { value: COST })
+      transaction = await blockzone.connect(buyer).buy(ID, { value: COST })
       await transaction.wait()
 
       // Get Deployer balance before
       balanceBefore = await ethers.provider.getBalance(deployer.address)
 
       // Withdraw
-      transaction = await dappazon.connect(deployer).withdraw()
+      transaction = await blockzone.connect(deployer).withdraw()
       await transaction.wait()
     })
 
@@ -120,7 +120,7 @@ describe("Dappazon", () => {
     })
 
     it('Updates the contract balance', async () => {
-      const result = await ethers.provider.getBalance(dappazon.address)
+      const result = await ethers.provider.getBalance(blockzone.address)
       expect(result).to.equal(0)
     })
   })
